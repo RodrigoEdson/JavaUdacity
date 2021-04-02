@@ -1,13 +1,11 @@
 package ref.udemy.springtest.MVCTeste.model;
 
-import java.util.List;
-
-public class PersonData {
+public class PersonDataForm {
 
     private String name;
     private String city;
     private int age;
-    private List<String> emails;
+    private String email;
 
     public String getName() {
         return name;
@@ -33,11 +31,11 @@ public class PersonData {
         this.age = age;
     }
 
-    public List<String> getEmails() {
-        return emails;
+    public String getEmail() {
+        return email;
     }
 
-    public void setEmails(List<String> emails) {
-        this.emails = emails;
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
