@@ -2,9 +2,11 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
+import com.udacity.jwdnd.course1.cloudstorage.model.File;
 import com.udacity.jwdnd.course1.cloudstorage.model.Note;
 import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
+import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -20,10 +22,12 @@ public class HomeController {
 
     private CredentialService credentialService;
     private NoteService noteService;
+    private FileService fileService;
 
-    public HomeController(CredentialService credentialService, NoteService noteService) {
+    public HomeController(CredentialService credentialService, NoteService noteService, FileService fileService) {
         this.credentialService = credentialService;
         this.noteService = noteService;
+        this.fileService = fileService;
     }
 
     @GetMapping()
@@ -32,7 +36,9 @@ public class HomeController {
 
         List<Credential> credentialsList = this.credentialService.getCredentialsByUserID(user.getUserId());
         List<Note> notesList = this.noteService.getNotesByUserID(user.getUserId());
+        List<File> filesList = this.fileService.getFilesListByUserId(user.getUserId());
 
+        model.addAttribute("filesList", filesList);
         model.addAttribute("credentialsList", credentialsList);
         model.addAttribute("notesList", notesList);
 
