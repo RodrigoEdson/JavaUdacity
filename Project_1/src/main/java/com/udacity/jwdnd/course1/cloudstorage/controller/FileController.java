@@ -1,15 +1,12 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
+import com.udacity.jwdnd.course1.cloudstorage.model.FileDTO;
 import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -28,7 +25,7 @@ public class FileController {
     }
 
     @PostMapping
-    public String fileUpload(@RequestParam("fileUpload")MultipartFile fileUpload, Model model, Authentication auth, RedirectAttributes redirectAttributes) throws IOException {
+    public String fileUpload(@RequestParam("fileUpload")MultipartFile fileUpload, Authentication auth, RedirectAttributes redirectAttributes) throws IOException {
         User user = (User) auth.getDetails();
 
         InputStream fis = fileUpload.getInputStream();
@@ -42,20 +39,16 @@ public class FileController {
 
         fileService.saveFile(file);
 
-        List<File> filesList = fileService.getFilesListByUserId(user.getUserId());
-        redirectAttributes.addFlashAttribute("filesList", filesList);
         redirectAttributes.addFlashAttribute("activeTab", "files");
 
         return "redirect:/home";
     }
+//https://knowledge.udacity.com/questions/497201
+    @PostMapping("/delete")
+    public String deleteFile ( RedirectAttributes redirectAttributes,@ModelAttribute FileDTO fileDTO){
 
-    public String deleteFile (Authentication auth, RedirectAttributes redirectAttributes, @PathVariable int fileId){
-        User user = (User) auth.getDetails();
+        fileService.deleteFile(fileDTO.getFileId());
 
-        fileService.deleteFile(fileId);
-
-        List<File> filesList = fileService.getFilesListByUserId(user.getUserId());
-        redirectAttributes.addFlashAttribute("filesList", filesList);
         redirectAttributes.addFlashAttribute("activeTab", "files");
 
         return "redirect:/home";

@@ -1,6 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
+import com.udacity.jwdnd.course1.cloudstorage.model.CredentialDTO;
 import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
 import com.udacity.jwdnd.course1.cloudstorage.services.EncryptionService;
@@ -13,7 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.List;
 
 @Controller
 @RequestMapping("/credential")
@@ -50,9 +50,18 @@ public class CredentialController {
             this.credentialService.updateCredential(credential);
         }
 
-        List<Credential> credentialsList = this.credentialService.getCredentialsByUserID(user.getUserId());
-        redirectAttributes.addFlashAttribute("credentialsList", credentialsList);
         redirectAttributes.addFlashAttribute("activeTab", "credentials");
         return "redirect:/home";
+    }
+
+    @PostMapping("/delete")
+    public String deleteCredential(RedirectAttributes redirectAttributes, @ModelAttribute CredentialDTO credentialDTO){
+
+        credentialService.deleteCredential(credentialDTO.getCredentialId());
+
+        redirectAttributes.addFlashAttribute("activeTab", "credentials");
+
+        return "redirect:/home";
+
     }
 }

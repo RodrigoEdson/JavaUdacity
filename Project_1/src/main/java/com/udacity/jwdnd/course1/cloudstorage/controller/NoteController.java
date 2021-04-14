@@ -1,6 +1,7 @@
 package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Note;
+import com.udacity.jwdnd.course1.cloudstorage.model.NoteDTO;
 import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import org.springframework.security.core.Authentication;
@@ -33,10 +34,17 @@ public class NoteController {
             noteService.udateNote(note);
         }
 
-        List<Note> notes = noteService.getNotesByUserID(user.getUserId());
-
-        redirectAttributes.addFlashAttribute("notesList", notes);
         redirectAttributes.addFlashAttribute("activeTab", "notes");
+        return "redirect:/home";
+    }
+
+    @PostMapping("/delete")
+    public String deleteNote (Authentication auth, RedirectAttributes redirectAttributes, @ModelAttribute NoteDTO noteDTO){
+
+        noteService.deleteNote(noteDTO.getNoteId());
+
+        redirectAttributes.addFlashAttribute("activeTab", "notes");
+
         return "redirect:/home";
     }
 

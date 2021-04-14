@@ -26,4 +26,8 @@ public class CredentialService {
     public List<Credential> getCredentialsByUserID (Integer userId) {
         return credentialMapper.getCredentialsByUserId(userId);
     }
+
+    public void deleteCredential(Integer crecentialID) {
+        credentialMapper.delete(crecentialID);
+    }
 }
