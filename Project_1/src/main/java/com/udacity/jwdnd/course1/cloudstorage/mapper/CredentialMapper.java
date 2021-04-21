@@ -7,18 +7,22 @@ import java.util.List;
 
 @Mapper
 public interface CredentialMapper {
+
     @Insert("insert into credentials (credentialid, url, username, key, password, userid ) values (#{credentialId}, #{url}, #{userName}, #{key}, #{password}, #{userId}) ")
     @Options(useGeneratedKeys = true, keyProperty = "credentialId")
     int insert (Credential credential);
 
-    @Update("update credentials set url = #{url}, username = #{userName} , password = #{password} where credentialid = #{credentialId}")
+    @Update("update credentials set url = #{url}, username = #{userName} , key = #{key}, password = #{password} where credentialid = #{credentialId}")
     int update (Credential credential);
 
-    @Select("select * from credentials where userid = #{userID}")
+    @Select("select * from credentials where userid = #{userId}")
     List<Credential> getCredentialsByUserId(Integer userId);
 
-    @Delete("Delete from credentials where credentialid = ${crecentialID}")
-    void delete(Integer crecentialID);
+    @Delete("Delete from credentials where credentialid = ${credentialId}")
+    void delete(Integer credentialId);
+
+    @Select("select * from credentials where userid = #{userId} and  credentialid = ${credentialId}")
+    Credential getCredentialByCredentialId(Integer userId, int credentialId);
 }
 
 

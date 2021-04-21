@@ -52,9 +52,8 @@
                                 <th:block th:each="file : ${filesList}">
                                 <tr>
                                     <td>
-                                        <a target="_blank" class="btn btn-success">View</a>
-                                       <!-- <a  class="btn btn-danger" th:href="@{/file/delete/{fileId}(fileId=${file.fileId})}">Delete</a>-->
                                         <form action="#" th:action="@{/file/delete}"  method="POST">
+                                            <a target="_blank" class="btn btn-success" th:href="@{/file/view/{fileId}(fileId=${file.fileId})}">View</a>
                                             <input type="hidden" name="fileId" id="delete-file-id" th:value="${file.fileId}">
                                             <button type="submit" id= "deleteFileSubmit" class="btn btn-danger">
                                                 Delete</button>
@@ -85,9 +84,9 @@
                                     <th:block th:each="note : ${notesList}">
                                     <tr>
                                         <td>
-                                            <button type="button" class="btn btn-success"  onclick="showNoteModal()">Edit</button>
                                             <!--<a class="btn btn-danger">Delete</a>-->
                                             <form action="#" th:action="@{/note/delete}"  method="POST">
+                                                <button type="button" class="btn btn-success"  th:onclick="javascript:showNoteModal([[${note.noteId}]],[[${note.noteTitle}]],[[${note.noteDescription}]])">Edit</button>
                                                 <input type="hidden" name="noteId" id="delete-note-id" th:value="${note.noteId}">
                                                 <button type="submit" id= "deleteNoteSubmit" class="btn btn-danger">
                                                     Delete</button>
@@ -151,9 +150,13 @@
                                 <th:block th:each="credential : ${credentialsList}">
                                 <tr>
                                     <td>
-                                        <button type="button" class="btn btn-success">Edit</button>
                                         <!--<a class="btn btn-danger">Delete</a>-->
                                         <form action="#" th:action="@{/credential/delete}"  method="POST">
+                                            <button type="button"
+                                                    class="btn btn-success"
+                                                    th:onclick="javascript:showCredentialModal([[${credential.credentialId}]],[[${credential.url}]],[[${credential.userName}]],[[${credential.password}]])">
+                                                Edit
+                                            </button>
                                             <input type="hidden" name="credentialId" id="delete-credential-id" th:value="${credential.credentialId}">
                                             <button type="submit" id= "deleteCredentialSubmit" class="btn btn-danger">
                                                 Delete</button>
@@ -215,8 +218,10 @@
         <script type="text/javascript">
             $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
                 localStorage.setItem('activeTab', $(e.target).attr('href'));
+                console.log($(e.target).attr('href'));
             });
-            var activeTab = localStorage.getItem('activeTab');
+            let activeTab = localStorage.getItem('activeTab');
+            console.log(activeTab);
             if (activeTab) {
                 $('.nav-tabs a[href="' + activeTab + '"]').tab('show');
             }
@@ -231,10 +236,22 @@
 
             // For opening the credentials modal
             function showCredentialModal(credentialId, url, username, password) {
-                $('#credential-id').val(credentialId ? credentialId : '');
-                $('#credential-url').val(url ? url : '');
-                $('#credential-username').val(username ? username : '');
-                $('#credential-password').val(password ? password : '');
+
+                if((credentialId!==undefined)) {
+	            	$(document).ready(function() {
+	            	    $.ajax({
+	            	        url: "http://localhost:8080/credential/getCredential/"+credentialId
+	            	    }).then(function(data) {
+	            	    	console.log(data)
+	            	    	$('#credential-id').val(data.credentialId);
+	                        $('#credential-url').val(data.url);
+	                        $('#credential-username').val(data.userName);
+	                        $('#credential-password').val(data.password);
+	                        $('#credentialModal').modal('show');
+	            	    });
+	            	});
+            	}
+
                 $('#credentialModal').modal('show');
             }
         </script>

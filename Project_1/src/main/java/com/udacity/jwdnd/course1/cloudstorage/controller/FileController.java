@@ -4,6 +4,9 @@ import com.udacity.jwdnd.course1.cloudstorage.model.File;
 import com.udacity.jwdnd.course1.cloudstorage.model.FileDTO;
 import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +46,7 @@ public class FileController {
 
         return "redirect:/home";
     }
-//https://knowledge.udacity.com/questions/497201
+
     @PostMapping("/delete")
     public String deleteFile ( RedirectAttributes redirectAttributes,@ModelAttribute FileDTO fileDTO){
 
@@ -52,6 +55,18 @@ public class FileController {
         redirectAttributes.addFlashAttribute("activeTab", "files");
 
         return "redirect:/home";
+    }
+
+    @GetMapping("/view/{fileId}")
+    public ResponseEntity viewFile(Authentication auth, @PathVariable("fileId") Integer fileId){
+        User user = (User) auth.getDetails();
+
+        File file = fileService.getFileById(user.getUserId(), fileId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(file.getContentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=\""+file.getFileName()+"\"")
+                .body(file.getFileData());
     }
 
 }
