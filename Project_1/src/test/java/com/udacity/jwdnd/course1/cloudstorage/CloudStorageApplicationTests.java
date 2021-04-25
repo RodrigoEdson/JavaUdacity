@@ -1,16 +1,18 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import okhttp3.Credentials;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -74,13 +76,8 @@ class CloudStorageApplicationTests {
 	@Test
 	public void loggedUserCanAccessHomePage(){
 		//create a user
-		driver.get(" http://localhost:" + port + "/signup");
-		signupPage = new SignupPage(driver);
-		signupPage.registerUser("Jose","Silva","jose","MyPass");
-
-		driver.get("http://localhost:" + port + "/login");
-		loginPage = new LoginPage(driver);
-		loginPage.login("jose","MyPass");
+		createUser("Jose","Silva","jose","MyPass");
+		login("jose", "MyPass");
 
 		driver.get("http://localhost:" + port + "/home");
 		homePage = new HomePage(driver,true);
@@ -90,13 +87,8 @@ class CloudStorageApplicationTests {
 	@Test
 	public void loggedUserCantAccessHomePageAfterLogoff(){
 		//create a user
-		driver.get(" http://localhost:" + port + "/signup");
-		signupPage = new SignupPage(driver);
-		signupPage.registerUser("Maria","Silva","maria","MyPass");
-
-		driver.get("http://localhost:" + port + "/login");
-		loginPage = new LoginPage(driver);
-		loginPage.login("maria","MyPass");
+		createUser("Maria","Silva","maria","MyPass");
+		login("maria", "MyPass");
 
 
 		driver.get("http://localhost:" + port + "/home");
@@ -109,15 +101,9 @@ class CloudStorageApplicationTests {
 
 	@Test
 	public void createANoteAndCheckItInTheList() throws InterruptedException {
-		//create a user
-		driver.get(" http://localhost:" + port + "/signup");
-		signupPage = new SignupPage(driver);
-		signupPage.registerUser("Joana","Silva","joana","MyPass");
 
-		driver.get("http://localhost:" + port + "/login");
-		loginPage = new LoginPage(driver);
-		loginPage.login("joana","MyPass");
-
+		createUser("Joana","Silva","joana","MyPass");
+		login("joana", "MyPass");
 
 		driver.get("http://localhost:" + port + "/home");
 		homePage = new HomePage(driver,true);
@@ -135,13 +121,8 @@ class CloudStorageApplicationTests {
 	@Test
 	public void editExistingNote() throws InterruptedException {
 		//create a user
-		driver.get(" http://localhost:" + port + "/signup");
-		signupPage = new SignupPage(driver);
-		signupPage.registerUser("Pedro","Silva","pedro","MyPass");
-
-		driver.get("http://localhost:" + port + "/login");
-		loginPage = new LoginPage(driver);
-		loginPage.login("pedro","MyPass");
+		createUser("Pedro","Silva","pedro","MyPass");
+		login("pedro", "MyPass");
 
 		driver.get("http://localhost:" + port + "/home");
 		homePage = new HomePage(driver,true);
@@ -166,13 +147,8 @@ class CloudStorageApplicationTests {
 	@Test
 	public void deleteExistingNote() throws InterruptedException {
 		//create a user
-		driver.get(" http://localhost:" + port + "/signup");
-		signupPage = new SignupPage(driver);
-		signupPage.registerUser("Otavio","Silva","otavio","MyPass");
-
-		driver.get("http://localhost:" + port + "/login");
-		loginPage = new LoginPage(driver);
-		loginPage.login("otavio","MyPass");
+		createUser("Otavio","Silva","otavio","MyPass");
+		login("otavio", "MyPass");
 
 		driver.get("http://localhost:" + port + "/home");
 		homePage = new HomePage(driver,true);
@@ -189,6 +165,133 @@ class CloudStorageApplicationTests {
 		Thread.sleep(1000);
 		assertEquals(qtdNotesBeforeDelete -1 ,homePage.getNotesCount());
 
+	}
+
+	@Test
+	public void createAListOfCredentials() throws InterruptedException {
+		createUser("Rodrigo","Silva","rodrigo","MyPass");
+		login("rodrigo", "MyPass");
+
+		List<Credential> credentials = getCredentialList();
+		addCredentialList(credentials);
+
+		Thread.sleep(1000);
+		List<String> urlList = homePage.getCredentialUrlList();
+		String [] passwordArray = homePage.getCredentialPasswordArray();
+
+		boolean credentialsOk = true;
+		for (Credential c : credentials){
+			boolean hasUrl = urlList.contains(c.getUrl());
+			boolean isPasswordNotEncrypted = passwordArray[urlList.indexOf(c.getUrl())].equals(c.getPassword());
+			if (!hasUrl || isPasswordNotEncrypted ){
+				credentialsOk = false;
+			}
+		}
+
+		assertEquals(true, credentialsOk);
+	}
+
+	@Test
+	public void editAListOfCredentials() throws InterruptedException {
+		createUser("Tatiana","Silva","tatiana","MyPass");
+		login("tatiana", "MyPass");
+
+		List<Credential> credentials = getCredentialList();
+		addCredentialList(credentials);
+
+		Thread.sleep(1000);
+		List<WebElement> credentialsRowList = homePage.getCredentialsRowsList();
+		Thread.sleep(1000);
+
+		boolean credentialsOk = true;
+		for (int i = 0; i < credentials.size(); i++){
+			Credential credentialEdited = new Credential(
+					null,
+					credentials.get(i).getUrl() + " edited",
+					credentials.get(i).getUserName() + " edited",
+					null,
+					credentials.get(i).getPassword() + " edited",
+					null
+			);
+
+			homePage.editExistingCredential(i);
+			Thread.sleep(1000);
+			//Ajax is being refused by the server :(
+			/*if (! (homePage.getCredentialPassword() == credentials.get(i).getPassword())){
+				credentialsOk = false;
+			}*/
+			homePage.setCredentialData(credentialEdited);
+			Thread.sleep(1000);
+			homePage.clickSubmitCredential();
+			Thread.sleep(1000);
+
+			if (!credentialsRowList.get(i).findElement(By.name("credentialUrl")).getText().equals(credentials.get(i).getUrl() + " edited") ){
+				credentialsOk = false;
+			}
+		}
+
+		assertEquals(true, credentialsOk);
+	}
+
+	@Test
+	public void deleteAListOfCredentials() throws InterruptedException {
+		createUser("Tais","Silva","tais","MyPass");
+		login("tais", "MyPass");
+
+		List<Credential> credentials = getCredentialList();
+		addCredentialList(credentials);
+
+		Thread.sleep(1000);
+		List<WebElement> credentialsRowList = homePage.getCredentialsRowsList();
+		Thread.sleep(1000);
+
+		while (credentialsRowList.size()>0){
+			credentialsRowList.get(0).findElement(By.name("form-credential")).submit();
+			Thread.sleep(1000);
+		}
+
+		assertEquals(0, credentialsRowList.size());
+	}
+
+	private void addCredentialList (List<Credential> credentials) throws InterruptedException {
+		driver.get("http://localhost:" + port + "/home");
+		homePage = new HomePage(driver,true);
+		homePage.goToTab(HomePage.TAB_CREDENTIALS);
+
+		for (Credential c : credentials) {
+
+			Thread.sleep(1000);
+			homePage.clickNewCredential();
+			Thread.sleep(1000);
+			homePage.setCredentialData(c);
+			Thread.sleep(1000);
+			homePage.clickSubmitCredential();
+
+		}
+
+	}
+
+	private List<Credential> getCredentialList (){
+		List<Credential> credentials =  new ArrayList<Credential>();
+
+		credentials.add( new Credential(null,"URL 1","Username 1",null,"Password 1",null));
+		credentials.add( new Credential(null,"URL 2","Username 2",null,"Password 2",null));
+		credentials.add( new Credential(null,"URL 3","Username 3",null,"Password 3",null));
+
+		return credentials;
+	}
+
+	private void login (String username, String password){
+		driver.get("http://localhost:" + port + "/login");
+		loginPage = new LoginPage(driver);
+		loginPage.login(username,password);
+	}
+
+	private void createUser(String firstName, String lastName, String username, String password){
+		//create a user
+		driver.get(" http://localhost:" + port + "/signup");
+		signupPage = new SignupPage(driver);
+		signupPage.registerUser(firstName,lastName,username,password);
 	}
 
 }

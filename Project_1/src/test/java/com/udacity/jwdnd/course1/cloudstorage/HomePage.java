@@ -1,5 +1,6 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -7,6 +8,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomePage {
@@ -30,7 +32,7 @@ public class HomePage {
     @FindBy(id="nav-credentials-tab")
     private WebElement navCredentials;
 
-
+    //NOTES
     @FindBy(id="note-title")
     private WebElement noteTitle;
 
@@ -45,6 +47,25 @@ public class HomePage {
 
     @FindBy(xpath="//table[@id='notesTable']/tbody/tr")
     private List<WebElement> noteRowsList;
+
+    //CREDENTIALS
+    @FindBy(id="button-new-credential")
+    private WebElement buttonNewCredential;
+
+    @FindBy(id="credential-url")
+    private WebElement credentialUrl;
+
+    @FindBy(id="credential-username")
+    private WebElement credentialUsername;
+
+    @FindBy(id="credential-password")
+    private WebElement credentialPassword;
+
+    @FindBy(id="credentialSubmit")
+    private WebElement buttonSubmitCredential;
+
+    @FindBy(xpath="//table[@id='credentialTable']/tbody/tr")
+    private List<WebElement> credentialsRowsList;
 
     public HomePage(WebDriver webDriver , boolean testLoad) {
         if (testLoad) {
@@ -103,5 +124,51 @@ public class HomePage {
 
     public void deleteNote(int noteIndex) {
         this.noteRowsList.get(noteIndex).findElement(By.name("form-note")).submit();
+    }
+
+    public void clickNewCredential() {
+        this.buttonNewCredential.click();
+    }
+
+    public void setCredentialData(Credential credential) {
+        this.credentialUrl.clear();
+        this.credentialUrl.sendKeys(credential.getUrl());
+
+        this.credentialUsername.clear();
+        this.credentialUsername.sendKeys(credential.getUserName());
+
+        this.credentialPassword.clear();
+        this.credentialPassword.sendKeys(credential.getPassword());
+
+    }
+
+    public void clickSubmitCredential() {
+        this.buttonSubmitCredential.submit();
+    }
+
+    public List<String> getCredentialUrlList(){
+        List<String>  urlList = new ArrayList<String>();
+        for (int i = 0; i < credentialsRowsList.size(); i++){
+            urlList.add(credentialsRowsList.get(i).findElement(By.name("credentialUrl")).getText());
+        }
+        return urlList;
+    }
+    public String[] getCredentialPasswordArray(){
+        String []  urlList = new String[ credentialsRowsList.size()];
+        for (int i = 0; i < credentialsRowsList.size(); i++){
+            urlList[i] = credentialsRowsList.get(i).findElement(By.name("credentialPassword")).getText();
+        }
+        return urlList;
+    }
+
+    public List<WebElement> getCredentialsRowsList(){
+        return credentialsRowsList;
+    }
+
+    public String getCredentialPassword (){
+        return credentialPassword.getText();
+    }
+    public void editExistingCredential(int noteIndex) {
+        this.credentialsRowsList.get(noteIndex).findElement(By.name("edit-credential")).click();
     }
 }

@@ -138,7 +138,7 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab">
-                        <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showCredentialModal()">
+                        <button style="margin: 0.25em;" id="button-new-credential" type="button" class="btn btn-info float-right" onclick="showCredentialModal()">
                             + Add a New Credential
                         </button>
 
@@ -157,9 +157,10 @@
                                 <tr>
                                     <td>
                                         <!--<a class="btn btn-danger">Delete</a>-->
-                                        <form action="#" th:action="@{/credential/delete}"  method="POST">
+                                        <form name="form-credential" action="#" th:action="@{/credential/delete}"  method="POST">
                                             <button type="button"
                                                     class="btn btn-success"
+                                                    name = "edit-credential"
                                                     th:onclick="javascript:showCredentialModal([[${credential.credentialId}]],[[${credential.url}]],[[${credential.userName}]],[[${credential.password}]])">
                                                 Edit
                                             </button>
@@ -168,9 +169,9 @@
                                                 Delete</button>
                                         </form>
                                     </td>
-                                    <th scope="row" th:text="${credential.url}">Example Credential URL</th>
-                                    <td th:text="${credential.userName}">Example Credential Username</td>
-                                    <td th:text="${credential.password}">Example Credential Password</td>
+                                    <td name="credentialUrl" scope="row" th:text="${credential.url}">Example Credential URL</td>
+                                    <td name="credentialUsername" th:text="${credential.userName}">Example Credential Username</td>
+                                    <td name="credentialPassword" th:text="${credential.password}">Example Credential Password</td>
                                 </tr>
                                 </th:block>
                                 </tbody>
@@ -216,7 +217,8 @@
             </div>
         </div>
 
-        <script th:src="@{/js/jquery-slim.min.js}"></script>
+        <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+        <!--<script th:src="@{/js/jquery-slim.min.js}"></script>-->
         <script th:src="@{/js/popper.min.js}"></script>
         <script th:src="@{/js/bootstrap.min.js}"></script>
 
@@ -241,20 +243,19 @@
             // For opening the credentials modal
             function showCredentialModal(credentialId, url, username, password) {
 
+                $('#credential-id').val(credentialId ? credentialId : '');
+                $('#credential-url').val(url ? url : '');
+                $('#credential-username').val(username ? username : '');
+
                 if((credentialId!==undefined)) {
-	            	$(document).ready(function() {
+                	$(document).ready(function() {
 	            	    $.ajax({
 	            	        url: "http://localhost:8080/credential/getCredential/"+credentialId
 	            	    }).then(function(data) {
-	            	    	$('#credential-id').val(data.credentialId);
-	                        $('#credential-url').val(data.url);
-	                        $('#credential-username').val(data.userName);
-	                        $('#credential-password').val(data.password);
-	                        $('#credentialModal').modal('show');
+	            	    	$('#credential-password').val(data.password);
 	            	    });
 	            	});
             	}
-
                 $('#credentialModal').modal('show');
             }
         </script>
