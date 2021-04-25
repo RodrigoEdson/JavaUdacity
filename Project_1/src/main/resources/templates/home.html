@@ -12,7 +12,7 @@
         <div class="container">
             <div id="logoutDiv">
                 <form action="#" th:action="@{/logout}" method="POST">
-                    <button type="submit" class="btn btn-secondary float-right">Logout</button>
+                    <button id="logout-submit-button" type="submit" class="btn btn-secondary float-right">Logout</button>
                 </form>
             </div>
             <div id="contentDiv" style="clear: right;">
@@ -25,6 +25,12 @@
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="nav-files" role="tabpanel" aria-labelledby="nav-files-tab">
+                        <div id="file-msg-error" th:if="${fileMsgError}" th:text="${fileMsgError}" class="alert alert-danger">
+                            File OK
+                        </div>
+                        <div id="file-msg-ok" th:if="${fileMsgOK}" th:text="${fileMsgOK}" class="alert alert-success">
+                            File OK
+                        </div>
                         <form action="#" th:action="@{/file}" enctype="multipart/form-data" method="POST">
                             <div class="container">
                                 <div class="row" style="margin: 1em;">
@@ -67,12 +73,12 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
-                        <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
+                        <button style="margin: 0.25em;" id="button-new-note" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
                             + Add a New Note
                         </button>
 
                         <div class="table-responsive">
-                            <table class="table table-striped" id="userTable">
+                            <table class="table table-striped" id="notesTable">
                                 <thead>
                                     <tr>
                                         <th style="width: 20%" scope="col" ></th>
@@ -85,14 +91,14 @@
                                     <tr>
                                         <td>
                                             <!--<a class="btn btn-danger">Delete</a>-->
-                                            <form action="#" th:action="@{/note/delete}"  method="POST">
-                                                <button type="button" class="btn btn-success"  th:onclick="javascript:showNoteModal([[${note.noteId}]],[[${note.noteTitle}]],[[${note.noteDescription}]])">Edit</button>
+                                            <form name="form-note" action="#" th:action="@{/note/delete}"  method="POST">
+                                                <button type="button" name="edit-note" class="btn btn-success"  th:onclick="javascript:showNoteModal([[${note.noteId}]],[[${note.noteTitle}]],[[${note.noteDescription}]])">Edit</button>
                                                 <input type="hidden" name="noteId" id="delete-note-id" th:value="${note.noteId}">
                                                 <button type="submit" id= "deleteNoteSubmit" class="btn btn-danger">
                                                     Delete</button>
                                             </form>
                                         </td>
-                                        <th scope="row" th:text="${note.noteTitle}" >Example Note Title</th>
+                                        <td name="noteTitle" scope="row" th:text="${note.noteTitle}" >Example Note Title</td>
                                         <td  th:text="${note.noteDescription}">Example Note Description </td>
                                     </tr>
                                     </th:block>
@@ -215,13 +221,11 @@
         <script th:src="@{/js/bootstrap.min.js}"></script>
 
         <!--For opening the note modal-->
-        <script type="text/javascript">
+        <script id="mainScript" type="text/javascript">
             $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
                 localStorage.setItem('activeTab', $(e.target).attr('href'));
-                console.log($(e.target).attr('href'));
             });
             let activeTab = localStorage.getItem('activeTab');
-            console.log(activeTab);
             if (activeTab) {
                 $('.nav-tabs a[href="' + activeTab + '"]').tab('show');
             }
@@ -242,7 +246,6 @@
 	            	    $.ajax({
 	            	        url: "http://localhost:8080/credential/getCredential/"+credentialId
 	            	    }).then(function(data) {
-	            	    	console.log(data)
 	            	    	$('#credential-id').val(data.credentialId);
 	                        $('#credential-url').val(data.url);
 	                        $('#credential-username').val(data.userName);

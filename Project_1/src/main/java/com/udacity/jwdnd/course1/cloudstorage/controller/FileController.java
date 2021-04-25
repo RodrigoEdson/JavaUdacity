@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -28,7 +29,7 @@ public class FileController {
     }
 
     @PostMapping
-    public String fileUpload(@RequestParam("fileUpload")MultipartFile fileUpload, Authentication auth, RedirectAttributes redirectAttributes) throws IOException {
+    public String fileUpload(@RequestParam("fileUpload")MultipartFile fileUpload,  Authentication auth, RedirectAttributes redirectAttributes) throws IOException {
         User user = (User) auth.getDetails();
 
         InputStream fis = fileUpload.getInputStream();
@@ -40,10 +41,15 @@ public class FileController {
         file.setContentType(fileUpload.getContentType());
         file.setFileData(fis.readAllBytes());
 
-        fileService.saveFile(file);
-
+        if (file.getFileName() == null || file.getFileName().isBlank()){
+            redirectAttributes.addFlashAttribute("fileMsgError","No file selected");
+        }else if (fileService.isFileAlreadyLoaded(user.getUserId(), file.getFileName()) ){
+            redirectAttributes.addFlashAttribute("fileMsgError","File already load, choose another one");
+        }else {
+            fileService.saveFile(file);
+            redirectAttributes.addFlashAttribute("fileMsgOK","File successfully saved");
+        }
         redirectAttributes.addFlashAttribute("activeTab", "files");
-
         return "redirect:/home";
     }
 

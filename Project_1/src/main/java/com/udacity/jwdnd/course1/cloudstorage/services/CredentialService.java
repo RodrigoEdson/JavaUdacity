@@ -74,17 +74,6 @@ public class CredentialService {
         credential.setKey(encodedKey);
         credential.setPassword(encryptedPassword);
 
-        Credential decr = new Credential(
-                credential.getCredentialId(),
-                credential.getUrl(),
-                credential.getUserName(),
-                credential.getKey(),
-                credential.getPassword(),
-                credential.getUserId()
-        );
-
-        decr = decryptCredential(decr);
-
         return credential;
     }
 

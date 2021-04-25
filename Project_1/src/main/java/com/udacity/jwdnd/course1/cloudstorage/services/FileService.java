@@ -30,4 +30,13 @@ public class FileService {
     public File getFileById(Integer userId, Integer fileId) {
         return fileMapper.getFileById(userId,fileId);
     }
+
+    public  boolean isFileAlreadyLoaded(Integer userId, String fileName) {
+        Integer fileId = fileMapper.getFileIdByFileName(userId, fileName);
+        if (fileId == null){
+            return false;
+        }else{
+            return true;
+        }
+    }
 }
