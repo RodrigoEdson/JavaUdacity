@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -54,10 +55,13 @@ public class FileController {
     }
 
     @PostMapping("/delete")
-    public String deleteFile ( RedirectAttributes redirectAttributes,@ModelAttribute FileDTO fileDTO){
+    public String deleteFile ( RedirectAttributes redirectAttributes, Authentication auth, @ModelAttribute FileDTO fileDTO){
 
+        User user = (User) auth.getDetails();
+        File file = fileService.getFileById(user.getUserId(), fileDTO.getFileId());
         fileService.deleteFile(fileDTO.getFileId());
 
+        redirectAttributes.addFlashAttribute("fileMsgOK","File "+file.getFileName()+" successfully deleted");
         redirectAttributes.addFlashAttribute("activeTab", "files");
 
         return "redirect:/home";

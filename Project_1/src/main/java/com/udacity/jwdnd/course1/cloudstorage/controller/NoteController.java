@@ -34,6 +34,7 @@ public class NoteController {
             noteService.udateNote(note);
         }
 
+        redirectAttributes.addFlashAttribute("noteMsgOK","Note "+note.getNoteTitle()+" successfully saved");
         redirectAttributes.addFlashAttribute("activeTab", "notes");
         return "redirect:/home";
     }
@@ -43,6 +44,7 @@ public class NoteController {
 
         noteService.deleteNote(noteDTO.getNoteId());
 
+        redirectAttributes.addFlashAttribute("noteMsgOK","Note successfully deleted");
         redirectAttributes.addFlashAttribute("activeTab", "notes");
 
         return "redirect:/home";

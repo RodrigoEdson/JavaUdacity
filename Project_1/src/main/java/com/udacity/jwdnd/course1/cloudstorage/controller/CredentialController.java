@@ -35,6 +35,7 @@ public class CredentialController {
             this.credentialService.updateCredential(credential);
         }
 
+        redirectAttributes.addFlashAttribute("credentialMsgOK","Credential "+credential.getUrl()+" successfully saved");
         redirectAttributes.addFlashAttribute("activeTab", "credentials");
         return "redirect:/home";
     }
@@ -44,6 +45,7 @@ public class CredentialController {
 
         credentialService.deleteCredential(credentialDTO.getCredentialId());
 
+        redirectAttributes.addFlashAttribute("credentialMsgOK","Credential successfully deleted");
         redirectAttributes.addFlashAttribute("activeTab", "credentials");
 
         return "redirect:/home";

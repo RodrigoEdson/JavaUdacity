@@ -26,7 +26,7 @@
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="nav-files" role="tabpanel" aria-labelledby="nav-files-tab">
                         <div id="file-msg-error" th:if="${fileMsgError}" th:text="${fileMsgError}" class="alert alert-danger">
-                            File OK
+                            File Error
                         </div>
                         <div id="file-msg-ok" th:if="${fileMsgOK}" th:text="${fileMsgOK}" class="alert alert-success">
                             File OK
@@ -73,6 +73,12 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
+                        <div id="note-msg-error" th:if="${noteMsgError}" th:text="${noteMsgError}" class="alert alert-danger">
+                            Note Error
+                        </div>
+                        <div id="note-msg-ok" th:if="${noteMsgOK}" th:text="${noteMsgOK}" class="alert alert-success">
+                            Note OK
+                        </div>
                         <button style="margin: 0.25em;" id="button-new-note" type="button" class="btn btn-info float-right" onclick="showNoteModal()">
                             + Add a New Note
                         </button>
@@ -138,6 +144,12 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab">
+                        <div id="credential-msg-error" th:if="${credentialMsgError}" th:text="${credentialMsgError}" class="alert alert-danger">
+                            Note Error
+                        </div>
+                        <div id="credential-msg-ok" th:if="${credentialMsgOK}" th:text="${credentialMsgOK}" class="alert alert-success">
+                            Note OK
+                        </div>
                         <button style="margin: 0.25em;" id="button-new-credential" type="button" class="btn btn-info float-right" onclick="showCredentialModal()">
                             + Add a New Credential
                         </button>
