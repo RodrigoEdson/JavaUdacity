@@ -1,6 +1,6 @@
 package com.udacity.pricing.api;
 
-import com.udacity.pricing.domain.price.Price;
+import com.udacity.pricing.domain.Price;
 import com.udacity.pricing.service.PriceException;
 import com.udacity.pricing.service.PriceService;
 import org.springframework.beans.factory.annotation.Autowired;

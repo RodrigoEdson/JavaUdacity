@@ -1,9 +1,11 @@
 package com.udacity.pricing.service;
 
-import com.udacity.pricing.domain.price.Price;
+import com.udacity.pricing.domain.Price;
 import com.udacity.pricing.repository.PriceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Implements the pricing service to get prices for each vehicle.
@@ -22,13 +24,13 @@ public class PriceService {
      */
     public Price getPrice(Long vehicleId) throws PriceException {
 
-        Price p = priceRepository.findPriceByVehicleId(vehicleId);
+        Optional<Price> p = priceRepository.findPriceByVehicleId(vehicleId);
 
-        if (p.getVehicleId() == null) {
+        if (p.isEmpty()) {
             throw new PriceException("Cannot find price for Vehicle " + vehicleId);
         }
 
-        return p;
+        return p.get();
     }
 
 
