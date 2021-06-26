@@ -33,6 +33,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 /**
  * Implements testing of the CarController class.
@@ -96,18 +97,10 @@ public class CarControllerTest {
          *   the whole list of vehicles. This should utilize the car from `getCar()`
          *   below (the vehicle will be the first in the list).
          */
-        Car car = getCar();
-        //adding the car
-        mvc.perform(
-                post(new URI("/cars"))
-                        .content(json.write(car).getJson())
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isCreated());
-        //getting the car
+        createCar();
         mvc.perform(get("/cars"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.carList[0].details.model", is(car.getDetails().getModel())))
+                .andExpect(jsonPath("_embedded.carList[0].details.model", is(getCar().getDetails().getModel())))
             ;
     }
 
@@ -118,18 +111,13 @@ public class CarControllerTest {
     @Test
     public void findCar() throws Exception {
         /**
-         * TODO: Add a test to check that the `get` method works by calling
+         * OK: Add a test to check that the `get` method works by calling
          *   a vehicle by ID. This should utilize the car from `getCar()` below.
          */
-        Car car = getCar();
-        //adding the car
-        mvc.perform(
-                post(new URI("/cars"))
-                        .content(json.write(car).getJson())
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isCreated())
-        ;
+        createCar();
+        mvc.perform(get("/cars/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("details.model", is(getCar().getDetails().getModel())));
     }
 
     /**
@@ -143,6 +131,10 @@ public class CarControllerTest {
          *   when the `delete` method is called from the Car Controller. This
          *   should utilize the car from `getCar()` below.
          */
+        createCar();
+        mvc.perform(delete("/cars/1"))
+                .andExpect(status().isNoContent());
+
     }
 
     /**
